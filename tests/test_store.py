@@ -1,5 +1,6 @@
 """Workflow invariants at the persistent storage boundary."""
 
+from concurrent.futures import ThreadPoolExecutor
 import hashlib
 import sqlite3
 
@@ -177,9 +178,22 @@ def test_candidates_and_validation_history_survive_restart(tmp_path):
 
 def test_empty_store_and_in_memory_workspace():
     store = Store(":memory:")
+    assert store.path == ":memory:"
     assert store.latest_revision() is None
     assert store.latest_candidate() is None
     assert store.list_revisions() == []
     assert store.list_validations() == []
     revision = store.create_revision("")
     assert store.latest_revision() == revision
+    with ThreadPoolExecutor(max_workers=4) as executor:
+        threaded = list(executor.map(lambda index: store.create_revision(f"Thread {index}"), range(16)))
+    latest = store.latest_revision()
+    assert latest["id"] in {revision["id"] for revision in threaded}
+    with ThreadPoolExecutor(max_workers=4) as executor:
+        observed = list(executor.map(lambda _index: store.latest_revision()["id"], range(16)))
+    assert observed == [latest["id"]] * 16
+    assert len(store.list_revisions()) == 17
+    store.close()
+    store.close()
+    with pytest.raises(WorkflowError, match="closed"):
+        store.latest_revision()

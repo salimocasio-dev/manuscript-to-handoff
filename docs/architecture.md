@@ -6,7 +6,7 @@ The model proposes edits. The store applies human decisions to a particular sour
 
 | Component | Responsibility | Boundary |
 | --- | --- | --- |
-| `app.py` | Streamlit review, approval, candidate inspection, failure controls, and downloads | Exposes separate review and approval actions; shows persisted validation results |
+| `app.py` | Streamlit review, approval, candidate inspection, failure controls, and downloads | Isolates the default in-memory workspace per browser session; exposes separate review and approval actions |
 | `mth/editorial.py` | Authored fixture and optional OpenAI structured suggestions | Receives source text; has no database write or approval capability |
 | `mth/store.py` | SQLite revisions, suggestions, decisions, approvals, candidates, and reports | Rejects stale edits; records exact-source approvals and preserves history |
 | `mth/handoff.py` | Four-spread candidate creation and ZIP export | Generation cannot declare validity; export calls the independent validator |
@@ -25,7 +25,7 @@ flowchart TD
     V -->|Pass| Z["ZIP recheck and download"]
 ```
 
-The authored example supplies suggestions without a network call. Live mode uses one provider and validates the returned revision ID, content hash, and suggestion schema. Provider output remains advice. Exact passage matching in the store rejects missing or ambiguous replacements, overlapping accepted edits, and suggestions for stale revisions.
+The authored example supplies suggestions without a network call. Live mode is unavailable unless the operator explicitly enables it; a nonblank API key and per-revision consent are also required. The adapter uses one provider and validates the returned revision ID, content hash, and suggestion schema. Provider output remains advice. Exact passage matching in the store rejects missing or ambiguous replacements, overlapping accepted edits, and suggestions for stale revisions.
 
 ## Revision and approval model
 
@@ -33,7 +33,7 @@ Every manuscript save records exact text, a UUID, parent revision, creation time
 
 Approval records contain a revision ID, hash, reviewer label, and timestamp. The app uses the latest revision and that revision's approval for new handoffs. An old approval remains historically valid for its old text; it cannot authorize a new draft. SQLite mutation guards protect immutable history from accidental updates and deletes through ordinary application code.
 
-The local database is the trust boundary. A person who can rewrite it and its guards can change the evidence. Hashes detect differences relative to the independently supplied source; they do not establish identity or external authenticity.
+The SQLite workspace is the trust boundary. By default it is an isolated, per-session in-memory database; setting `MTH_DB_PATH` opts into a durable local file. A person who can rewrite a configured file and its guards can change the evidence. Hashes detect differences relative to the independently supplied source; they do not establish identity or external authenticity.
 
 ## Exact text transfer
 

@@ -8,7 +8,7 @@ Salim Ocasio framed this project as a small portfolio application inspired by hi
 
 | Decision | Reason and tradeoff |
 | --- | --- |
-| Build one local workflow with Streamlit and SQLite | Makes the behavior inspectable and easy to reproduce; leaves multi-user identity and collaboration outside the prototype |
+| Default to a per-session in-memory demo, with explicit SQLite-file persistence | Makes public evaluation isolated and disposable while retaining a durable local option; leaves multi-user identity and collaboration outside the prototype |
 | Separate suggestions, decisions, revisions, and approval | Accepting an edit cannot quietly authorize production; adds one deliberate human step |
 | Use AI for optional editorial suggestions | Keeps editorial judgment reviewable; correctness checks remain ordinary code |
 | Ship an authored offline fixture alongside a live adapter | Makes the demo usable without credentials; the fixture proves workflow behavior, not live model quality |
@@ -21,12 +21,12 @@ Accessible historical material was reviewed briefly: the curated worth-keeping R
 
 The [executed CLI demonstration](../examples/output/evidence.json) accepted one suggestion and rejected another, preserved those decisions after reopening the store, recorded a scripted test approval, and validated the actual clean ZIP. It then rejected missing, duplicated, altered, reordered, and wrong-revision text with export blocked. Rebuilding from the approved source restored a valid package. These corruptions changed candidate contents without changing the approved manuscript.
 
-The complete pytest run passed **63 tests**, including five Streamlit AppTest workflows using the actual app's widgets and backend. Those interface tests covered the successful path, missing-line failure and recovery, wrong revision and fresh approval requirements, saved history, and unavailable live AI. Browser rendering and download clicks remain unverified because the environment blocked the local browser route. The [verification record](verification.md) separates executed checks from remaining gaps.
+The complete pytest run passed **66 tests**, including eight Streamlit AppTest workflows using the actual app's widgets and backend. Those interface tests covered the successful path, missing-line failure and recovery, wrong revision and fresh approval requirements, durable history, default session isolation/reset, and fail-closed live AI with explicit consent. A real-browser walkthrough also covered the recorded workflow, stateful tab navigation, failure/recovery, and the final ZIP download. The [verification record](verification.md) separates executed checks from remaining gaps.
 
 The live adapter is implemented with a structured response schema and mocked provider tests. No live API call has been verified. The project makes no claims about customers, measured productivity gains, revenue, or a fully autonomous publishing business.
 
 ## What I would take forward
 
-The useful result is an inspectable approval boundary and a handoff that has to match its source. The next steps would be to run the live adapter with an authorized test account, observe an editor using the workflow, and improve span allocation around actual editorial needs. Shared use would require authenticated reviewers and a source of audit records outside a user's editable local database.
+The useful result is an inspectable approval boundary and a handoff that has to match its source. The next steps would be to run the live adapter with an authorized test account, observe an editor using the workflow, and improve span allocation around actual editorial needs. Shared use would require authenticated reviewers, tenant-isolated durable storage, resource controls, and a source of audit records outside a user's editable local database.
 
 Those would be separate changes with their own evidence. A passing text-integrity check still says nothing about whether a story is good or a book is ready to print.

@@ -12,6 +12,7 @@ import hashlib
 import json
 from pathlib import Path
 import sqlite3
+from threading import RLock
 from typing import Any, Iterator
 import uuid
 
@@ -33,7 +34,7 @@ def _hash(text: str) -> str:
 
 
 class Store:
-    """One linear workspace backed by a SQLite file.
+    """One linear workspace backed by SQLite, either on disk or in memory.
 
     Each public mutation uses a single write transaction. Old revisions,
     approvals, candidates, and validation reports are append-only. Suggestions
@@ -42,6 +43,8 @@ class Store:
 
     def __init__(self, path: str | Path):
         self.path = str(path)
+        self._lock = RLock()
+        self._closed = False
         # Keep an in-memory connection alive when requested by callers/tests.
         self._memory_connection: sqlite3.Connection | None = None
         if self.path == ":memory:":
@@ -117,28 +120,43 @@ class Store:
                     )
 
     def _connect(self) -> sqlite3.Connection:
-        connection = sqlite3.connect(self.path, timeout=10, isolation_level=None)
+        # Streamlit may execute successive reruns of one browser session on
+        # different script threads. Store's lock still serializes all access.
+        connection = sqlite3.connect(self.path, timeout=10, isolation_level=None, check_same_thread=False)
         connection.row_factory = sqlite3.Row
         connection.execute("PRAGMA foreign_keys = ON")
         connection.execute("PRAGMA busy_timeout = 10000")
         return connection
 
+    def close(self) -> None:
+        """Release retained resources and make this store unavailable."""
+        with self._lock:
+            if self._closed:
+                return
+            if self._memory_connection is not None:
+                self._memory_connection.close()
+                self._memory_connection = None
+            self._closed = True
+
     @contextmanager
     def _connection(self, *, write: bool = False) -> Iterator[sqlite3.Connection]:
-        connection = self._memory_connection or self._connect()
-        try:
-            if write:
-                connection.execute("BEGIN IMMEDIATE")
-            yield connection
-            if write:
-                connection.commit()
-        except Exception:
-            if write:
-                connection.rollback()
-            raise
-        finally:
-            if connection is not self._memory_connection:
-                connection.close()
+        with self._lock:
+            if self._closed:
+                raise WorkflowError("Store is closed.")
+            connection = self._memory_connection or self._connect()
+            try:
+                if write:
+                    connection.execute("BEGIN IMMEDIATE")
+                yield connection
+                if write:
+                    connection.commit()
+            except Exception:
+                if write:
+                    connection.rollback()
+                raise
+            finally:
+                if connection is not self._memory_connection:
+                    connection.close()
 
     @staticmethod
     def _row(row: sqlite3.Row | None) -> dict[str, Any] | None:
