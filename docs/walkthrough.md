@@ -11,9 +11,9 @@ Start the app in a fresh workspace so the first button is **Load sample manuscri
 | 1:10–1:30 | Click **Remove a manuscript line**, then **Run validation**. Point to failed coverage and reconstruction checks and the disabled final download. | “Now I've removed real text from the candidate. The approved source hasn't changed. The validator finds the gap and blocks export. I can still download the failure report.” |
 | 1:30–1:40 | Click **Rebuild from approved revision**, then **Run validation**. | “Rebuilding restores the source text. A fresh validation passes and the download becomes available again.” |
 | 1:40–1:55 | Click **Use earlier revision**, then **Run validation**. Rebuild and validate again. | “Using the original revision also fails. It doesn't match the current approval. The same recovery gives us a clean candidate again.” |
-| 1:55–2:05 | Point to **Evidence & history**, then return to the enabled download. | “The decisions and failed attempts survive a restart. This proves controlled text transfer. Pagination, design, and print readiness still need their own review.” |
+| 1:55–2:05 | Point to **Evidence & history**, then return to the enabled download. | “The decisions and failed attempts stay together in this session, or survive a restart when I configure durable local storage. This proves controlled text transfer. Pagination, design, and print readiness still need their own review.” |
 
-If the workspace already has history, use **Load sample manuscript** to append a new sample draft; it does not reset earlier work. For the wrong-revision demonstration, choose that newly loaded sample's ID in **Earlier revision for demo**.
+Use **Reset demo session** for a clean temporary walkthrough. In a configured durable workspace, **Load sample manuscript** appends a new sample draft instead of resetting earlier work. For the wrong-revision demonstration, choose the earlier draft's ID under **Earlier revision for demo**.
 
 To reproduce the artifact evidence outside the UI:
 

@@ -2,26 +2,46 @@
 
 **AI-assisted publishing operations with human approval and verifiable production handoffs.**
 
-An editorial suggestion is useful only if someone can review it. An approved manuscript is useful only if the next person receives the same text. This local application connects those two problems in one working workflow:
+[![CI](https://github.com/salimocasio-dev/manuscript-to-handoff/actions/workflows/ci.yml/badge.svg)](https://github.com/salimocasio-dev/manuscript-to-handoff/actions/workflows/ci.yml)
+
+An editorial suggestion is useful only if someone can review it. An approved manuscript is useful only if the next person receives the same text. This application connects those two problems in one working workflow:
 
 Sample manuscript → editorial suggestions → human review → approved revision → production candidate → deterministic validation → handoff ZIP.
 
 The demonstration deliberately removes a manuscript line or uses an earlier revision. The validator checks the changed artifact against the approved source and blocks export. Rebuilding the candidate and validating it again restores the handoff.
 
+![Manuscript to Handoff showing a validated production handoff ready to download](docs/assets/handoff-ready.jpg)
+
+## What this demonstrates
+
+- Product thinking around a real editorial-to-production failure mode.
+- A human-in-the-loop boundary where suggestions, decisions, revisions, and approval remain separate.
+- Deterministic checks of the artifact a production partner actually receives, rather than trust in generated metadata.
+- Reproducible evidence: executable failure/recovery scenarios, 66 automated tests, a real-server smoke check, and CI.
+
 ## Run locally
 
-Use Python 3.12. From the repository directory, in a POSIX shell:
+Use Python 3.12 in a POSIX shell:
 
 ```bash
+git clone https://github.com/salimocasio-dev/manuscript-to-handoff.git
+cd manuscript-to-handoff
 python3.12 -m venv .venv
 source .venv/bin/activate
 python -m pip install -r requirements.txt
 streamlit run app.py
 ```
 
-Open the local URL printed by Streamlit, usually `http://localhost:8501`. The included sample and authored editorial fixture need no credentials.
+Open the local URL printed by Streamlit, usually `http://localhost:8501`. The included sample and authored editorial fixture need no credentials. By default, each browser session gets an isolated in-memory workspace; its data is not written to disk and disappears when that session ends or is reset.
 
-The app saves its history in `data/workflow.sqlite3`. Restarting it preserves revisions, review decisions, approvals, candidates, and validation reports. To use a separate workspace, set `MTH_DB_PATH` to another file before starting the app. Each workspace has one current manuscript and a linear revision history.
+For durable local history across app restarts, explicitly configure a SQLite file:
+
+```bash
+export MTH_DB_PATH="$PWD/data/workflow.sqlite3"
+streamlit run app.py
+```
+
+Each configured workspace has one current manuscript and a linear revision history. Do not paste confidential text into a deployment you do not control.
 
 ## Demonstrate the workflow
 
@@ -46,7 +66,7 @@ The demo script runs the real store, editorial fixture, generator, validator, an
 
 Actual example outputs are included under [examples/output](examples/output). The [execution record](examples/output/evidence.json) shows the clean ZIP passed; missing, duplicated, altered, reordered, and wrong-revision candidates were rejected with export blocked; rebuilding recovered successfully. These are generated artifacts from the fictional sample, not private publishing work.
 
-**Executed verification:** 63 pytest tests passed: 16 store tests, 28 handoff tests, 14 editorial tests, and five Streamlit AppTest workflows. AppTest exercised the actual application's widgets and backend through success, blocked export, recovery, history, and unavailable live mode. The real HTTP server, health endpoint, and frontend asset also passed a smoke check (`python scripts/smoke_server.py`). These checks do not establish browser rendering or download behavior. The environment blocked the local browser route, so visual layout and browser download clicks remain unverified. See the [test report](examples/test-results.xml) and [verification record](docs/verification.md).
+**Executed verification:** 66 pytest tests passed: 16 store tests, 28 handoff tests, 14 editorial tests, and eight Streamlit AppTest workflows. AppTest exercised the actual application's widgets and backend through success, blocked export, recovery, persistent history, session isolation/reset, and fail-closed live mode. A real-browser walkthrough covered the complete recorded workflow, navigation across reruns, validation failure/recovery, and final ZIP download. The real HTTP server, health endpoint, and frontend asset also passed a smoke check (`python scripts/smoke_server.py`). See the [test report](examples/test-results.xml) and [verification record](docs/verification.md).
 
 To independently recheck the included ZIP against source and approval records outside that ZIP:
 
@@ -68,10 +88,11 @@ Live mode uses the OpenAI Responses API with a structured response schema. Set e
 ```bash
 export OPENAI_API_KEY='your-api-key'
 export OPENAI_MODEL='gpt-6-astra'
+export MTH_ENABLE_LIVE_AI=1
 streamlit run app.py
 ```
 
-`.env.example` documents these variables; the app does **not** load a `.env` file automatically. Choose a model available to your account that supports structured outputs. In the app, select **Live model** and acknowledge sending the manuscript to OpenAI before generating suggestions. A provider error is displayed; it never silently switches to the fixture.
+`.env.example` documents these variables; the app does **not** load a `.env` file automatically. Live calls are fail-closed: an API key alone does not expose the provider option. Choose a model available to your account that supports structured outputs. In the app, select **Live model** and acknowledge sending the manuscript to OpenAI before generating suggestions. A provider error is displayed; it never silently switches to the fixture.
 
 The integration follows the official [Structured Outputs documentation](https://developers.openai.com/api/docs/guides/structured-outputs), checked September 9, 2026. **Live API execution remains unverified:** no credentials were available. Adapter behavior is covered with mocked responses; that is not evidence of a successful live call.
 
@@ -94,10 +115,15 @@ The export code reopens the actual ZIP and validates its files before returning 
 
 - Approval is a separate human action tied to one revision and content hash. A new draft requires fresh approval; historical approvals remain in history.
 - Source spans use half-open Unicode code-point offsets. Content hashes use exact UTF-8 bytes. Punctuation, line endings, whitespace, and Unicode composition are not normalized. File import preserves original line endings; browser editing preserves the text the browser submits.
-- This is a single-user local prototype. Reviewer labels are not authenticated identities. Database guards prevent accidental mutation through ordinary application use; they do not make a locally editable database tamper-proof.
+- This is a public, local-first portfolio prototype. Its default demo workspace is isolated per browser session; durable file storage is explicit. Reviewer labels are not authenticated identities. Database guards prevent accidental mutation through ordinary application use; they do not make a locally editable database tamper-proof.
+- A hosted production or shared-team version would still need authenticated users, resource limits, durable tenant-isolated storage, and managed provider-key controls.
 - The fixed four-spread allocation demonstrates text transfer. A validation pass does not establish editorial quality, professional pagination, typography, illustration quality, or print readiness.
 - The sample and fixture were purpose-written with AI assistance. No unpublished manuscripts, private artwork, correspondence, or customer data are included. No customer adoption, revenue, or time savings are claimed.
 
-Salim Ocasio supplied the product brief and workflow requirements; implementation and documentation were AI-assisted. The application is inspired by his publishing-house workflow. It is a bounded portfolio prototype, with no public deployment or GitHub publication included.
+Salim Ocasio supplied the product brief and workflow requirements; implementation and documentation were AI-assisted. The application is inspired by his publishing-house workflow. It is a bounded portfolio prototype, published openly for inspection and reproducible evaluation.
 
 Read the [architecture](docs/architecture.md), [case study](docs/case-study.md), and [portfolio description](docs/portfolio.md).
+
+## License
+
+Released under the [MIT License](LICENSE).

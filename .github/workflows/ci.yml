@@ -1,0 +1,51 @@
+name: CI
+
+on:
+  push:
+  pull_request:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ci-${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+
+      - name: Set up Python
+        uses: actions/setup-python@5fda3b95a4ea91299a34e894583c3862153e4b97 # v7.0.0
+        with:
+          python-version: "3.12"
+          cache: pip
+
+      - name: Install locked dependencies
+        run: python -m pip install -r requirements.txt
+
+      - name: Check dependency consistency
+        run: python -m pip check
+
+      - name: Run test suite
+        run: python -m pytest -q
+
+      - name: Run end-to-end demonstration
+        run: python scripts/run_demo.py --output "${RUNNER_TEMP}/mth-demo"
+
+      - name: Independently verify the generated package
+        run: >-
+          python scripts/verify_package.py
+          "${RUNNER_TEMP}/mth-demo/clean_handoff.zip"
+          --source "${RUNNER_TEMP}/mth-demo/intended_revision.json"
+          --approval "${RUNNER_TEMP}/mth-demo/approval.json"
+          --candidate "${RUNNER_TEMP}/mth-demo/clean_candidate.json"
+
+      - name: Smoke-test the real server
+        run: python scripts/smoke_server.py

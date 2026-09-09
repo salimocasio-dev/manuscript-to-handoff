@@ -17,7 +17,7 @@ from mth.validation import candidate_hash, validate_candidate
 st.set_page_config(page_title="Manuscript to Handoff", page_icon="📖", layout="wide")
 st.markdown(
     """<style>
-    .block-container {max-width: 1240px; padding-top: 2.1rem; padding-bottom: 3rem;}
+    .block-container {max-width: 1240px; padding-bottom: 3rem;}
     h1, h2, h3 {color: #203344; letter-spacing: -.025em;}
     h1 {font-family: Georgia, serif !important; font-weight: 500 !important;}
     h3 {font-size: 1.28rem !important;}
@@ -31,9 +31,21 @@ st.markdown(
     unsafe_allow_html=True,
 )
 
-DB_PATH = Path(os.environ.get("MTH_DB_PATH", Path(__file__).parent / "data" / "workflow.sqlite3"))
-DB_PATH.parent.mkdir(parents=True, exist_ok=True)
-store = Store(DB_PATH)
+def environment_flag(name: str) -> bool:
+    """Treat only explicit truthy values as permission for an optional feature."""
+    return os.environ.get(name, "").strip().lower() in {"1", "true", "yes", "on"}
+
+
+configured_db_path = os.environ.get("MTH_DB_PATH", "").strip()
+EPHEMERAL_WORKSPACE = not configured_db_path
+LIVE_AI_ENABLED = environment_flag("MTH_ENABLE_LIVE_AI")
+
+if EPHEMERAL_WORKSPACE:
+    if not isinstance(st.session_state.get("_mth_store"), Store):
+        st.session_state["_mth_store"] = Store(":memory:")
+    store = st.session_state["_mth_store"]
+else:
+    store = Store(Path(configured_db_path).expanduser())
 
 
 def flash(message: str) -> None:
@@ -98,6 +110,20 @@ st.write("AI-assisted publishing operations with human approval and verifiable p
 st.caption("AI suggests. A person approves an exact revision. Ordinary code checks the text that leaves the workflow.")
 st.markdown('<div class="rule"></div>', unsafe_allow_html=True)
 
+if EPHEMERAL_WORKSPACE:
+    notice_col, reset_col = st.columns([5, 1], vertical_alignment="center")
+    with notice_col:
+        st.info(
+            "Temporary demo session — your data is isolated to this browser session and is not written to disk. "
+            "It disappears when the session ends or you reset it. Do not paste confidential manuscript text."
+        )
+    with reset_col:
+        if st.button("Reset demo session", use_container_width=True):
+            store.close()
+            st.session_state.clear()
+            st.session_state["workflow_tab"] = "Manuscript"
+            st.rerun()
+
 if notice := st.session_state.pop("notice", None):
     st.success(notice)
 
@@ -133,7 +159,9 @@ with st.container(border=True):
         st.caption(f"Current revision: {latest['id']} · {'Approved' if approval else 'Draft — not approved'} · SHA-256: {latest['content_hash'][:16]}…")
 
 manuscript_tab, review_tab, approval_tab, handoff_tab, evidence_tab = st.tabs(
-    ["Manuscript", "Edit & review", "Approval", "Handoff", "Evidence & history"]
+    ["Manuscript", "Edit & review", "Approval", "Handoff", "Evidence & history"],
+    key="workflow_tab",
+    on_change="rerun",
 )
 
 with manuscript_tab:
@@ -191,19 +219,30 @@ with review_tab:
             st.markdown("**Current manuscript**")
             st.code(latest["text"], language=None, wrap_lines=True)
         with suggestion_col:
-            mode = st.radio("Editorial mode", ["Recorded demo (authored fixture; no API call)", "Live model"], key="editorial_mode")
+            if not LIVE_AI_ENABLED and st.session_state.get("editorial_mode") == "Live model":
+                del st.session_state["editorial_mode"]
+            editorial_modes = ["Recorded demo (authored fixture; no API call)"]
+            if LIVE_AI_ENABLED:
+                editorial_modes.append("Live model")
+            mode = st.radio("Editorial mode", editorial_modes, key="editorial_mode")
             is_live = mode == "Live model"
             consent = False
             if is_live:
                 st.caption(f"Provider: OpenAI · Model: {default_model()}")
-                if not os.environ.get("OPENAI_API_KEY"):
+                if not os.environ.get("OPENAI_API_KEY", "").strip():
                     st.warning("Live review is unavailable: set OPENAI_API_KEY in your environment, then restart the app.")
                 consent = st.checkbox("I agree to send this manuscript to OpenAI for editorial review.", key=f"provider_consent_{latest['id']}")
             else:
                 st.caption("This authored example runs locally. It works only on the exact included sample and makes no claim of a live model response.")
-            can_generate = not is_live or (bool(os.environ.get("OPENAI_API_KEY")) and consent)
+                if not LIVE_AI_ENABLED:
+                    st.caption("Live AI is disabled by default. Set MTH_ENABLE_LIVE_AI=1 locally to make the provider option available.")
+            can_generate = not is_live or (
+                LIVE_AI_ENABLED and bool(os.environ.get("OPENAI_API_KEY", "").strip()) and consent
+            )
             if st.button("Generate suggestions", disabled=not can_generate):
                 try:
+                    if is_live and not LIVE_AI_ENABLED:
+                        raise EditorialError("Live AI is disabled. Set MTH_ENABLE_LIVE_AI=1 before starting the app.")
                     with st.spinner("Requesting live editorial suggestions…" if is_live else "Loading the authored fixture…"):
                         proposed = live_review(latest) if is_live else recorded_review(latest)
                     store.save_suggestions(latest["id"], proposed, mode="live" if is_live else "recorded", provider_model=default_model() if is_live else "authored_fixture")
@@ -289,6 +328,16 @@ with handoff_tab:
                 flash("Validation passed. The package can now be exported." if report["passed"] else "Validation failed. Final handoff export is blocked; inspect the report below.")
             except (WorkflowError, ValueError) as error:
                 failure(error)
+    package = None
+    if candidate_is_current and approval and report_bound_to_candidate and last_validation["report"].get("passed"):
+        try:
+            # A persisted pass is necessary; export also independently rechecks both
+            # the current candidate and the actual ZIP before yielding any bytes.
+            package = export_package(candidate, latest, approval)
+        except ExportBlocked:
+            st.error("Export blocked — the candidate no longer matches the current approved revision. Rebuild and validate again.")
+        except (WorkflowError, ValueError) as error:
+            failure(error)
     if candidate is not None:
         st.caption(f"Candidate record: {candidate_id}")
         if last_validation:
@@ -301,6 +350,13 @@ with handoff_tab:
             st.info("This candidate has no validation result yet. Export is blocked until you run validation.")
         with st.expander("Inspect the actual candidate contents"):
             st.json(candidate)
+    st.download_button(
+        "Download final handoff", data=package if package is not None else b"",
+        file_name="manuscript-handoff.zip", mime="application/zip", disabled=package is None,
+        type="primary",
+    )
+    st.caption("The ZIP includes source text, spread allocation, production notes, approval, validation, and a file-hash manifest. A pass proves the checked text-integrity conditions, not editorial or artistic quality.")
+    if candidate is not None:
         with st.container(border=True):
             st.markdown("**Try a real production error**")
             st.caption("These controls change the saved candidate artifact. The approved manuscript remains intact; the ordinary validator evaluates the changed contents.")
@@ -328,26 +384,17 @@ with handoff_tab:
                     flash("Clean candidate rebuilt from the approved revision. Run validation again to reopen export.")
                 except (WorkflowError, ValueError) as error:
                     failure(error)
-    package = None
-    if candidate_is_current and approval and report_bound_to_candidate and last_validation["report"].get("passed"):
-        try:
-            # A persisted pass is necessary; export also independently rechecks both
-            # the current candidate and the actual ZIP before yielding any bytes.
-            package = export_package(candidate, latest, approval)
-        except ExportBlocked as error:
-            st.error("Export blocked — the candidate no longer matches the current approved revision. Rebuild and validate again.")
-        except (WorkflowError, ValueError) as error:
-            failure(error)
-    st.download_button(
-        "Download final handoff", data=package if package is not None else b"",
-        file_name="manuscript-handoff.zip", mime="application/zip", disabled=package is None,
-        type="primary",
-    )
-    st.caption("The ZIP includes source text, spread allocation, production notes, approval, validation, and a file-hash manifest. A pass proves the checked text-integrity conditions, not editorial or artistic quality.")
 
 with evidence_tab:
     st.subheader("History is part of the handoff")
-    st.caption("Revisions, decisions, approvals, candidates, and validation outcomes persist in the local SQLite database across app restarts.")
+    if EPHEMERAL_WORKSPACE:
+        st.caption(
+            "Revisions, decisions, approvals, candidates, and validation outcomes stay in this temporary browser session only."
+        )
+    else:
+        st.caption(
+            "Revisions, decisions, approvals, candidates, and validation outcomes persist in the configured local SQLite database across app restarts."
+        )
     if revisions:
         st.markdown("**Manuscript revisions**")
         for revision in reversed(revisions):

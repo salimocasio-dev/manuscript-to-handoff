@@ -1,17 +1,17 @@
 # What was executed
 
-Verified on 9 September 2026 with Python 3.12.14 on Linux. The exact installed
+Verified on 9 September 2026 with Python 3.12.14 on macOS 26.6.2. The exact installed
 dependency versions are pinned in `requirements.txt`. This record separates
 executed behavior from code that still needs real-world verification.
 
 ## Automated results
 
-`python -m pytest -q` passed **63 tests**: 16 persistence/workflow tests,
-28 handoff/validator tests, 14 editorial-adapter tests, and 5 Streamlit AppTest
+`python -m pytest -q` passed **66 tests**: 16 persistence/workflow tests,
+28 handoff/validator tests, 14 editorial-adapter tests, and 8 Streamlit AppTest
 scenarios. Machine-readable results are in
 [`examples/test-results.xml`](../examples/test-results.xml).
 
-The five interface scenarios execute `app.py` through Streamlit's real widget
+The eight interface scenarios execute `app.py` through Streamlit's real widget
 test runtime. They exercise button clicks, radio decisions, approval controls,
 database state, validation messages, and download enablement. These are more
 than standalone business-logic tests. They do not render a browser page or
@@ -29,6 +29,8 @@ perform a browser download.
 | New draft invalidates current handoff | AppTest verifies export remains disabled after editing and after fresh approval, until a fresh candidate passes. |
 | Failure and recovery | AppTest verifies missing-line failure, downloadable report, unchanged approved source, rebuilding, revalidation and reopened export. |
 | Persistence across app reload | A fresh AppTest instance uses the same SQLite file and retains review decisions, approval, candidate and export state. |
+| Safe public default | Independent AppTest sessions receive distinct in-memory stores. Reset clears one session without changing another, and the replacement workspace remains usable. |
+| Live mode is fail-closed | A provider key alone cannot expose or call live review. An explicit enable flag, a nonblank key, and per-revision consent are all required. |
 | AI unavailable | Missing key, HTTP authentication/rate/server errors, timeouts, refusal, incomplete output and wrong-source output are tested without fallback. |
 | Actual SDK request contract | OpenAI SDK 3.10.0 sends the real structured Responses request into a mocked HTTP transport; a synthetic HTTP response is parsed by the real SDK. |
 | Manifest is insufficient on its own | Tests alter actual packaged text and recompute manifest hashes; independent text comparison still rejects it. Tests also reject forged success reports, changed approvals and duplicate ZIP entries. |
@@ -63,22 +65,28 @@ The real HTTP server smoke check passed: root, health endpoint and frontend
 JavaScript asset returned HTTP 200. See
 [`examples/server-smoke.json`](../examples/server-smoke.json).
 
+## Browser results
+
+A real-browser walkthrough completed the recorded path from sample manuscript
+through editorial decisions, approval, candidate build, validation, and final
+ZIP download. It then removed a manuscript line, observed the blocked export,
+rebuilt from the approved revision, and revalidated successfully. Tab selection
+remained stable across action-triggered reruns, the page header did not cover the
+prototype label at desktop or mobile viewport widths, and the browser console
+reported no application errors. The checked state is shown in the
+[`handoff-ready.jpg`](assets/handoff-ready.jpg) screenshot.
+
 ## What remains unverified
 
 - **Live model call:** No live API key was available and no provider request was
   made. The optional integration is implemented and tested with mocked HTTP
   responses. Actual account/model access, model usefulness and latency remain
   unverified.
-- **Browser rendering and interaction:** The available browser rejected the
-  local app address (`ERR_BLOCKED_BY_CLIENT`). Its supported preview path does
-  not support this Streamlit runtime. No successful browser walkthrough,
-  screenshot, mobile/desktop layout review or browser-download test is claimed.
-  The HTTP and AppTest checks described above did execute.
-- **Cross-platform setup:** Linux with Python 3.12.14 was tested. macOS and Windows
-  installation and browser behavior were not tested.
+- **Cross-platform setup:** macOS was tested locally. Linux is exercised by CI,
+  but Windows installation and browser behavior remain untested.
 - **Enterprise or publishing assurance:** Local approvals are unauthenticated;
   a database administrator can alter local trust records. No authenticated
-  reviewer identity, tamper-proof audit store, public deployment, customer
+  reviewer identity, tamper-proof audit store, hosted public deployment, customer
   adoption, measured business outcome, editorial certification or print-ready
   product is claimed.
 

@@ -5,6 +5,7 @@ from pathlib import Path
 import pytest
 from streamlit.testing.v1 import AppTest
 
+import mth.editorial as editorial
 from mth.editorial import SAMPLE_TEXT
 from mth.store import Store
 
@@ -35,6 +36,7 @@ def approve(app):
 def ui(tmp_path, monkeypatch):
     db_path = tmp_path / "ui.sqlite3"
     monkeypatch.setenv("MTH_DB_PATH", str(db_path))
+    monkeypatch.delenv("MTH_ENABLE_LIVE_AI", raising=False)
     monkeypatch.delenv("OPENAI_API_KEY", raising=False)
     app = AppTest.from_file(str(APP), default_timeout=10).run()
     assert not app.exception
@@ -148,8 +150,14 @@ def test_ui_requires_explicit_decisions_and_preserves_history_on_sample_reload(u
     assert [item["decision"] for item in store.list_suggestions(original["id"])] == ["rejected", "rejected"]
 
 
-def test_ui_live_unavailable_is_explicit_and_has_no_recorded_fallback(ui):
-    app, store = ui
+def test_ui_live_unavailable_is_explicit_and_has_no_recorded_fallback(tmp_path, monkeypatch):
+    db_path = tmp_path / "live-unavailable.sqlite3"
+    monkeypatch.setenv("MTH_DB_PATH", str(db_path))
+    monkeypatch.setenv("MTH_ENABLE_LIVE_AI", "true")
+    monkeypatch.delenv("OPENAI_API_KEY", raising=False)
+    app = AppTest.from_file(str(APP), default_timeout=10).run()
+    store = Store(db_path)
+    assert not app.exception
     click(app, "Load sample manuscript")
     next(item for item in app.radio if item.label == "Editorial mode").set_value("Live model").run()
     assert not app.exception
@@ -159,3 +167,104 @@ def test_ui_live_unavailable_is_explicit_and_has_no_recorded_fallback(ui):
     consent.check().run()
     assert button(app, "Generate suggestions").disabled
     assert store.list_suggestions(store.latest_revision()["id"]) == []
+
+
+def test_ui_default_sessions_are_isolated_and_resettable(monkeypatch):
+    monkeypatch.delenv("MTH_DB_PATH", raising=False)
+    monkeypatch.delenv("MTH_ENABLE_LIVE_AI", raising=False)
+    monkeypatch.delenv("OPENAI_API_KEY", raising=False)
+
+    first = AppTest.from_file(str(APP), default_timeout=10).run()
+    assert not first.exception
+    first_store = first.session_state["_mth_store"]
+    assert first_store.latest_revision() is None
+    click(first, "Load sample manuscript")
+    first_revision = first_store.latest_revision()
+
+    second = AppTest.from_file(str(APP), default_timeout=10).run()
+    assert not second.exception
+    second_store = second.session_state["_mth_store"]
+    assert second_store is not first_store
+    assert second_store.latest_revision() is None
+    click(second, "Load sample manuscript")
+    second_revision = second_store.latest_revision()
+    assert second_revision["id"] != first_revision["id"]
+
+    first.session_state["workflow_tab"] = "Edit & review"
+    first.run()
+    assert first.session_state["workflow_tab"] == "Edit & review"
+    click(first, "Generate suggestions")
+    assert first_store.latest_revision()["id"] == first_revision["id"]
+
+    click(first, "Reset demo session")
+    replacement_store = first.session_state["_mth_store"]
+    assert replacement_store is not first_store
+    assert replacement_store.latest_revision() is None
+    assert first.session_state["workflow_tab"] == "Manuscript"
+    assert second_store.latest_revision()["id"] == second_revision["id"]
+    click(first, "Load sample manuscript")
+    assert replacement_store.latest_revision() is not None
+
+
+def test_ui_api_key_alone_cannot_enable_live_calls(monkeypatch):
+    monkeypatch.delenv("MTH_DB_PATH", raising=False)
+    monkeypatch.setenv("MTH_ENABLE_LIVE_AI", "0")
+    monkeypatch.setenv("OPENAI_API_KEY", "fake-public-key")
+
+    def unexpected_live_call(*_args, **_kwargs):
+        raise AssertionError("Live provider must remain unreachable without explicit enablement")
+
+    monkeypatch.setattr(editorial, "live_review", unexpected_live_call)
+    app = AppTest.from_file(str(APP), default_timeout=10).run()
+    assert not app.exception
+    app.session_state["editorial_mode"] = "Live model"
+    click(app, "Load sample manuscript")
+
+    mode = next(item for item in app.radio if item.label == "Editorial mode")
+    assert mode.options == ["Recorded demo (authored fixture; no API call)"]
+    assert not any("send this manuscript to OpenAI" in item.label for item in app.checkbox)
+    click(app, "Generate suggestions")
+    store = app.session_state["_mth_store"]
+    suggestions = store.list_suggestions(store.latest_revision()["id"])
+    assert suggestions
+    assert {item["mode"] for item in suggestions} == {"recorded"}
+    assert {item["provider_model"] for item in suggestions} == {"authored_fixture"}
+
+
+def test_ui_enabled_live_mode_requires_fresh_revision_consent(tmp_path, monkeypatch):
+    db_path = tmp_path / "live-enabled.sqlite3"
+    monkeypatch.setenv("MTH_DB_PATH", str(db_path))
+    monkeypatch.setenv("MTH_ENABLE_LIVE_AI", "1")
+    monkeypatch.setenv("OPENAI_API_KEY", "fake-test-key")
+    monkeypatch.setenv("OPENAI_MODEL", "mock-editorial-model")
+    calls = []
+
+    def recorded_provider(revision):
+        calls.append(revision["id"])
+        return editorial.recorded_review(revision)
+
+    monkeypatch.setattr(editorial, "live_review", recorded_provider)
+    app = AppTest.from_file(str(APP), default_timeout=10).run()
+    assert not app.exception
+    click(app, "Load sample manuscript")
+    next(item for item in app.radio if item.label == "Editorial mode").set_value("Live model").run()
+    assert button(app, "Generate suggestions").disabled
+
+    consent = next(item for item in app.checkbox if "send this manuscript to OpenAI" in item.label)
+    consent.check().run()
+    assert not button(app, "Generate suggestions").disabled
+    click(app, "Generate suggestions")
+    store = Store(db_path)
+    original = store.latest_revision()
+    assert calls == [original["id"]]
+    suggestions = store.list_suggestions(original["id"])
+    assert {item["mode"] for item in suggestions} == {"live"}
+    assert {item["provider_model"] for item in suggestions} == {"mock-editorial-model"}
+
+    app.text_area[0].set_value(original["text"] + "\nA new ending.\n")
+    click(app, "Save new revision")
+    next(item for item in app.radio if item.label == "Editorial mode").set_value("Live model").run()
+    fresh_consent = next(item for item in app.checkbox if "send this manuscript to OpenAI" in item.label)
+    assert not fresh_consent.value
+    assert button(app, "Generate suggestions").disabled
+    assert calls == [original["id"]]
