@@ -1,0 +1,152 @@
+{
+  "id": "handoff_3d32f944d8b844b3ab0f8b528878faa3",
+  "revision_id": "3ca60d4a-ddd2-4737-92db-cf7f0e77867a",
+  "content_hash": "6802fd2774d47f285ae8b7d35b04c73147b5cc07044597011603265e94236e25",
+  "manuscript": "The Extra Chair\n\nI set a cup beside my own.\nThen I pulled out the little blue chair.\n\"Who's coming?\" asked Dad.\n\"I haven't decided yet.\"\n\nI invited the wooden duck.\nHe tipped into his cup, beak first.\nI invited my longest sock.\nIt couldn't sit up.\n\nThe room was very quiet.\nDad stood in the doorway with two biscuits.\n\"Is that seat taken?\"\nI looked at the duck. I looked at the sock.\n\n\"They can share,\" I said.\nDad squeezed into the little blue chair.\nHis knees came up beside his ears.\nI got another plate.\n",
+  "spreads": [
+    {
+      "number": 1,
+      "spans": [
+        {
+          "start": 0,
+          "end": 16,
+          "text": "The Extra Chair\n"
+        },
+        {
+          "start": 0,
+          "end": 16,
+          "text": "The Extra Chair\n"
+        },
+        {
+          "start": 16,
+          "end": 17,
+          "text": "\n"
+        },
+        {
+          "start": 17,
+          "end": 44,
+          "text": "I set a cup beside my own.\n"
+        },
+        {
+          "start": 44,
+          "end": 85,
+          "text": "Then I pulled out the little blue chair.\n"
+        },
+        {
+          "start": 85,
+          "end": 112,
+          "text": "\"Who's coming?\" asked Dad.\n"
+        },
+        {
+          "start": 112,
+          "end": 137,
+          "text": "\"I haven't decided yet.\"\n"
+        }
+      ]
+    },
+    {
+      "number": 2,
+      "spans": [
+        {
+          "start": 137,
+          "end": 138,
+          "text": "\n"
+        },
+        {
+          "start": 138,
+          "end": 165,
+          "text": "I invited the wooden duck.\n"
+        },
+        {
+          "start": 165,
+          "end": 201,
+          "text": "He tipped into his cup, beak first.\n"
+        },
+        {
+          "start": 201,
+          "end": 228,
+          "text": "I invited my longest sock.\n"
+        },
+        {
+          "start": 228,
+          "end": 248,
+          "text": "It couldn't sit up.\n"
+        }
+      ]
+    },
+    {
+      "number": 3,
+      "spans": [
+        {
+          "start": 248,
+          "end": 249,
+          "text": "\n"
+        },
+        {
+          "start": 249,
+          "end": 274,
+          "text": "The room was very quiet.\n"
+        },
+        {
+          "start": 274,
+          "end": 318,
+          "text": "Dad stood in the doorway with two biscuits.\n"
+        },
+        {
+          "start": 318,
+          "end": 340,
+          "text": "\"Is that seat taken?\"\n"
+        },
+        {
+          "start": 340,
+          "end": 384,
+          "text": "I looked at the duck. I looked at the sock.\n"
+        }
+      ]
+    },
+    {
+      "number": 4,
+      "spans": [
+        {
+          "start": 384,
+          "end": 385,
+          "text": "\n"
+        },
+        {
+          "start": 385,
+          "end": 411,
+          "text": "\"They can share,\" I said.\n"
+        },
+        {
+          "start": 411,
+          "end": 452,
+          "text": "Dad squeezed into the little blue chair.\n"
+        },
+        {
+          "start": 452,
+          "end": 487,
+          "text": "His knees came up beside his ears.\n"
+        },
+        {
+          "start": 487,
+          "end": 508,
+          "text": "I got another plate.\n"
+        }
+      ]
+    }
+  ],
+  "production_brief": "# Production handoff\n\nSource revision: 3ca60d4a-ddd2-4737-92db-cf7f0e77867a\n\nAllocate the approved source text across 4 ordered spreads as supplied in spreads.json. Span start/end values are half-open Python Unicode code-point offsets into manuscript.txt. Concatenate span text in spread order to recover the manuscript exactly, including line endings.\n\nPreserve all wording, punctuation, and line breaks. Keep art direction and production notes outside source spans. Any editorial change requires a new revision and separate human approval.\n\nThis fixed allocation demonstrates controlled text transfer. An editor and designer still need to decide pacing, pagination, illustration, typography, and print specifications. Text-integrity validation does not certify editorial quality or print readiness.\n",
+  "issues": [
+    {
+      "severity": "warning",
+      "message": "Spread allocation is a workflow demonstration; professional pagination and design remain outstanding."
+    }
+  ],
+  "approval": {
+    "id": "1fe7fda6-d65e-4ead-b386-79c035e09b18",
+    "revision_id": "3ca60d4a-ddd2-4737-92db-cf7f0e77867a",
+    "content_hash": "6802fd2774d47f285ae8b7d35b04c73147b5cc07044597011603265e94236e25",
+    "actor": "Scripted test reviewer (fictional demo only)",
+    "approved_at": "2026-09-09T10:52:52.811659+00:00"
+  }
+}

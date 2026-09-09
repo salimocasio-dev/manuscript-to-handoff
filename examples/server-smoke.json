@@ -1,0 +1,9 @@
+{
+  "executed_at": "2026-09-09T10:56:06.307665+00:00",
+  "root_http_status": 200,
+  "health_http_status": 200,
+  "health_body": "ok",
+  "frontend_asset_http_status": 200,
+  "frontend_asset_bytes": 527226,
+  "scope": "Real HTTP server and frontend asset smoke check. Does not prove browser rendering or clicks."
+}

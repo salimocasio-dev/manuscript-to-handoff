@@ -1,0 +1,15 @@
+{
+  "provenance": "Purpose-written offline editorial fixture authored with AI implementation assistance. This is not a captured provider API response; loading it makes no model call.",
+  "suggestions": [
+    {
+      "original": "I put a cup beside my cup.",
+      "replacement": "I set a cup beside my own.",
+      "rationale": "Try reducing the repeated noun for a smoother opening. The repetition may also be intentional; the human reviewer decides."
+    },
+    {
+      "original": "The room was very quiet.",
+      "replacement": "The clock clicked in the quiet.",
+      "rationale": "Try a concrete sound to convey the pause. Reject this if adding a clock introduces an unwanted story detail."
+    }
+  ]
+}

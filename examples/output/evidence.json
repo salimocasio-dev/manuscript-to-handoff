@@ -1,0 +1,61 @@
+{
+  "executed_at": "2026-09-09T10:52:52.828286+00:00",
+  "source": "fictional purpose-written sample",
+  "editorial_mode": "authored recorded fixture; no API call",
+  "approval_actor_is_test_fixture": true,
+  "original_preserved": true,
+  "accepted_and_rejected_decisions_survived_reload": true,
+  "clean_candidate_passed": true,
+  "actual_zip_passed": true,
+  "clean_zip_sha256": "72c03913693e186a8f83a4959d8a5d593e3514a12a9585658f8efcd24a108e87",
+  "corruptions": {
+    "missing_line": {
+      "rejected": true,
+      "export_blocked": true,
+      "errors": [
+        "reconstructed_exact",
+        "span_coverage"
+      ]
+    },
+    "duplicated": {
+      "rejected": true,
+      "export_blocked": true,
+      "errors": [
+        "reconstructed_exact",
+        "span_coverage"
+      ]
+    },
+    "altered": {
+      "rejected": true,
+      "export_blocked": true,
+      "errors": [
+        "reconstructed_exact",
+        "span_text"
+      ]
+    },
+    "reordered": {
+      "rejected": true,
+      "export_blocked": true,
+      "errors": [
+        "reconstructed_exact",
+        "span_coverage"
+      ]
+    },
+    "wrong_revision": {
+      "rejected": true,
+      "export_blocked": true,
+      "errors": [
+        "candidate_revision",
+        "candidate_source_hash",
+        "manuscript_exact",
+        "reconstructed_exact",
+        "span_text"
+      ]
+    }
+  },
+  "recovery_passed": true,
+  "new_draft_without_approval_blocked": true,
+  "persisted_validation_count": 7,
+  "live_api": "UNVERIFIED: no live request made",
+  "scope": "Text integrity and workflow controls only; no editorial quality or print-readiness certification."
+}

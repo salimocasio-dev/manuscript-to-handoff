@@ -1,0 +1,23 @@
+{
+  ".env.example": "7703b29d1060057119713d1c6dbac228639e5544f5803323f9851723360664ce",
+  ".gitattributes": "bb676f42ca858639a06209120eea090668d8eda7acc7ae376e270e4c75f4c30b",
+  ".gitignore": "a24e2a46a81eda9bc651a817766f5824c37d617a90d937a8cc43936f1cef6f22",
+  ".streamlit/config.toml": "4cb5aec16f657b8243b737e1770e914f0807f019218a19053eec1aa99a2c1b33",
+  "app.py": "a06ea1a1029a43a003a713183baa8828cf8e7527f03aa3e3e65c37a1cc483c58",
+  "examples/recorded_suggestions.json": "a68bf832ad65071c52b5d799a755ff069224129fc3d787337aab0d5c968a6e65",
+  "examples/sample_manuscript.txt": "d59726e21e7edd001def9bd5fa74ac22f57e7b7f8f60b954def409726f0c32b3",
+  "mth/__init__.py": "5374521f28f5bc73799ba01cbf118422d8b02066bf4d85e39dc944aee94be3e8",
+  "mth/editorial.py": "7ffa406444574ba752c1bd709de3760a93b1b68c26dbde45c5dbe79b838511bf",
+  "mth/handoff.py": "f3bfc9795617e68b4b4ab838e837c46077fbfee8298bad77d7fc64d4a6193067",
+  "mth/store.py": "201e6dfdb961765d7eabf3da4e203b65b0f9ff49ffb8486e2e93d33db9dc5677",
+  "mth/validation.py": "1fbc7d93bd265c4a578595bdf5950903a947d81ee48405bd20470da8f55999c3",
+  "pytest.ini": "c28d7ee43186a578bc0f8867e26fdf7edcb0f1275b12d71d85a20e95a524c4ef",
+  "requirements.txt": "68960ec5e02b4a2551281f78a5271b44443bb27ac74df6c00e8b530ab77b5bfa",
+  "scripts/run_demo.py": "19ec8ad871bf1d076b9a190b0bcd43651d1dc15f28a1ec1f0cb9451dd7e1f6ac",
+  "scripts/smoke_server.py": "2c892df8b0d3ceefbc0691002a3a3f99206c7fee0209d1d197dfe62cc2ff9e25",
+  "scripts/verify_package.py": "b3e80b148620275cf497f26435f8867614563e27b8e82f370561745887674696",
+  "tests/test_editorial.py": "a66585e98ceb2251621efb4f3db5cb6dbd5ff5e7ffc562010e281e029bf084f3",
+  "tests/test_handoff.py": "abe9711f55d3b7a465f22f0cd8312ce09a0f6e2783b6a67ce9582e944cd76f41",
+  "tests/test_store.py": "3d21e3b1a8069588c018ee35ec08b308653d22ebddfaa5f4bbaed46091066d81",
+  "tests/test_ui.py": "3f0f812293d553957345ebcdb79c1c294c26b9602a719421b1bc84a499c7ca0a"
+}

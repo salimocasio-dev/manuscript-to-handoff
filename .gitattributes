@@ -1,0 +1,4 @@
+# Keep recorded evidence and exact-text fixtures byte-for-byte on checkout.
+* text=auto eol=lf
+examples/** -text
+*.zip binary

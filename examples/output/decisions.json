@@ -1,0 +1,34 @@
+[
+  {
+    "id": "079d906a-b7d1-405d-8eb1-f7657d040445",
+    "revision_id": "50ee2880-3407-4c98-9bce-0f803513c0d8",
+    "original": "I put a cup beside my cup.",
+    "replacement": "I set a cup beside my own.",
+    "rationale": "Try reducing the repeated noun for a smoother opening. The repetition may also be intentional; the human reviewer decides.",
+    "start": 17,
+    "end": 43,
+    "match_status": "unique",
+    "decision": "accepted",
+    "mode": "recorded-example",
+    "provider_model": "authored fixture; no API call",
+    "created_at": "2026-09-09T10:52:52.810098+00:00",
+    "decided_at": "2026-09-09T10:52:52.810531+00:00",
+    "result_revision_id": "3ca60d4a-ddd2-4737-92db-cf7f0e77867a"
+  },
+  {
+    "id": "bfdfdc42-b50c-41e9-b6da-60d86fca4ba2",
+    "revision_id": "50ee2880-3407-4c98-9bce-0f803513c0d8",
+    "original": "The room was very quiet.",
+    "replacement": "The clock clicked in the quiet.",
+    "rationale": "Try a concrete sound to convey the pause. Reject this if adding a clock introduces an unwanted story detail.",
+    "start": 249,
+    "end": 273,
+    "match_status": "unique",
+    "decision": "rejected",
+    "mode": "recorded-example",
+    "provider_model": "authored fixture; no API call",
+    "created_at": "2026-09-09T10:52:52.810218+00:00",
+    "decided_at": "2026-09-09T10:52:52.810531+00:00",
+    "result_revision_id": "3ca60d4a-ddd2-4737-92db-cf7f0e77867a"
+  }
+]

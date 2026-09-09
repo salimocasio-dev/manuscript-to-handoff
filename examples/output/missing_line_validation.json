@@ -1,0 +1,423 @@
+{
+  "passed": false,
+  "checks": [
+    {
+      "code": "source_hash",
+      "passed": true,
+      "message": "The stored source hash must match the independently read source text."
+    },
+    {
+      "code": "source_revision_id",
+      "passed": true,
+      "message": "The intended source revision must have a nonempty revision ID."
+    },
+    {
+      "code": "candidate_revision",
+      "passed": true,
+      "message": "The candidate must use the intended revision."
+    },
+    {
+      "code": "candidate_source_hash",
+      "passed": true,
+      "message": "The candidate's source hash must match the actual intended manuscript."
+    },
+    {
+      "code": "candidate_id",
+      "passed": true,
+      "message": "The candidate must have a nonempty ID."
+    },
+    {
+      "code": "approval_required",
+      "passed": true,
+      "message": "A separate human approval record with actor and timestamp is required."
+    },
+    {
+      "code": "approval_binding",
+      "passed": true,
+      "message": "The independent approval must bind this exact source revision and hash."
+    },
+    {
+      "code": "approval_record",
+      "passed": true,
+      "message": "The candidate must carry the complete independent approval record unchanged."
+    },
+    {
+      "code": "manuscript_exact",
+      "passed": true,
+      "message": "Candidate manuscript wording, punctuation, and line breaks must exactly match approval."
+    },
+    {
+      "code": "spreads_required",
+      "passed": true,
+      "message": "An ordered spread allocation is required."
+    },
+    {
+      "code": "spread_order",
+      "passed": true,
+      "message": "Spread 1 must occupy its declared position."
+    },
+    {
+      "code": "span_bounds",
+      "passed": true,
+      "message": "Spread 1, span 1: source range [16, 17) must be valid and nonempty."
+    },
+    {
+      "code": "span_coverage",
+      "passed": false,
+      "message": "Spread 1, span 1: expected source offset 0, received 16; gaps, duplicates, and reordering are blocked."
+    },
+    {
+      "code": "span_text",
+      "passed": true,
+      "message": "Spread 1, span 1: allocated text must equal its exact source slice."
+    },
+    {
+      "code": "span_bounds",
+      "passed": true,
+      "message": "Spread 1, span 2: source range [17, 44) must be valid and nonempty."
+    },
+    {
+      "code": "span_coverage",
+      "passed": true,
+      "message": "Spread 1, span 2: expected source offset 17, received 17; gaps, duplicates, and reordering are blocked."
+    },
+    {
+      "code": "span_text",
+      "passed": true,
+      "message": "Spread 1, span 2: allocated text must equal its exact source slice."
+    },
+    {
+      "code": "span_bounds",
+      "passed": true,
+      "message": "Spread 1, span 3: source range [44, 85) must be valid and nonempty."
+    },
+    {
+      "code": "span_coverage",
+      "passed": true,
+      "message": "Spread 1, span 3: expected source offset 44, received 44; gaps, duplicates, and reordering are blocked."
+    },
+    {
+      "code": "span_text",
+      "passed": true,
+      "message": "Spread 1, span 3: allocated text must equal its exact source slice."
+    },
+    {
+      "code": "span_bounds",
+      "passed": true,
+      "message": "Spread 1, span 4: source range [85, 112) must be valid and nonempty."
+    },
+    {
+      "code": "span_coverage",
+      "passed": true,
+      "message": "Spread 1, span 4: expected source offset 85, received 85; gaps, duplicates, and reordering are blocked."
+    },
+    {
+      "code": "span_text",
+      "passed": true,
+      "message": "Spread 1, span 4: allocated text must equal its exact source slice."
+    },
+    {
+      "code": "span_bounds",
+      "passed": true,
+      "message": "Spread 1, span 5: source range [112, 137) must be valid and nonempty."
+    },
+    {
+      "code": "span_coverage",
+      "passed": true,
+      "message": "Spread 1, span 5: expected source offset 112, received 112; gaps, duplicates, and reordering are blocked."
+    },
+    {
+      "code": "span_text",
+      "passed": true,
+      "message": "Spread 1, span 5: allocated text must equal its exact source slice."
+    },
+    {
+      "code": "spread_order",
+      "passed": true,
+      "message": "Spread 2 must occupy its declared position."
+    },
+    {
+      "code": "span_bounds",
+      "passed": true,
+      "message": "Spread 2, span 1: source range [137, 138) must be valid and nonempty."
+    },
+    {
+      "code": "span_coverage",
+      "passed": true,
+      "message": "Spread 2, span 1: expected source offset 137, received 137; gaps, duplicates, and reordering are blocked."
+    },
+    {
+      "code": "span_text",
+      "passed": true,
+      "message": "Spread 2, span 1: allocated text must equal its exact source slice."
+    },
+    {
+      "code": "span_bounds",
+      "passed": true,
+      "message": "Spread 2, span 2: source range [138, 165) must be valid and nonempty."
+    },
+    {
+      "code": "span_coverage",
+      "passed": true,
+      "message": "Spread 2, span 2: expected source offset 138, received 138; gaps, duplicates, and reordering are blocked."
+    },
+    {
+      "code": "span_text",
+      "passed": true,
+      "message": "Spread 2, span 2: allocated text must equal its exact source slice."
+    },
+    {
+      "code": "span_bounds",
+      "passed": true,
+      "message": "Spread 2, span 3: source range [165, 201) must be valid and nonempty."
+    },
+    {
+      "code": "span_coverage",
+      "passed": true,
+      "message": "Spread 2, span 3: expected source offset 165, received 165; gaps, duplicates, and reordering are blocked."
+    },
+    {
+      "code": "span_text",
+      "passed": true,
+      "message": "Spread 2, span 3: allocated text must equal its exact source slice."
+    },
+    {
+      "code": "span_bounds",
+      "passed": true,
+      "message": "Spread 2, span 4: source range [201, 228) must be valid and nonempty."
+    },
+    {
+      "code": "span_coverage",
+      "passed": true,
+      "message": "Spread 2, span 4: expected source offset 201, received 201; gaps, duplicates, and reordering are blocked."
+    },
+    {
+      "code": "span_text",
+      "passed": true,
+      "message": "Spread 2, span 4: allocated text must equal its exact source slice."
+    },
+    {
+      "code": "span_bounds",
+      "passed": true,
+      "message": "Spread 2, span 5: source range [228, 248) must be valid and nonempty."
+    },
+    {
+      "code": "span_coverage",
+      "passed": true,
+      "message": "Spread 2, span 5: expected source offset 228, received 228; gaps, duplicates, and reordering are blocked."
+    },
+    {
+      "code": "span_text",
+      "passed": true,
+      "message": "Spread 2, span 5: allocated text must equal its exact source slice."
+    },
+    {
+      "code": "spread_order",
+      "passed": true,
+      "message": "Spread 3 must occupy its declared position."
+    },
+    {
+      "code": "span_bounds",
+      "passed": true,
+      "message": "Spread 3, span 1: source range [248, 249) must be valid and nonempty."
+    },
+    {
+      "code": "span_coverage",
+      "passed": true,
+      "message": "Spread 3, span 1: expected source offset 248, received 248; gaps, duplicates, and reordering are blocked."
+    },
+    {
+      "code": "span_text",
+      "passed": true,
+      "message": "Spread 3, span 1: allocated text must equal its exact source slice."
+    },
+    {
+      "code": "span_bounds",
+      "passed": true,
+      "message": "Spread 3, span 2: source range [249, 274) must be valid and nonempty."
+    },
+    {
+      "code": "span_coverage",
+      "passed": true,
+      "message": "Spread 3, span 2: expected source offset 249, received 249; gaps, duplicates, and reordering are blocked."
+    },
+    {
+      "code": "span_text",
+      "passed": true,
+      "message": "Spread 3, span 2: allocated text must equal its exact source slice."
+    },
+    {
+      "code": "span_bounds",
+      "passed": true,
+      "message": "Spread 3, span 3: source range [274, 318) must be valid and nonempty."
+    },
+    {
+      "code": "span_coverage",
+      "passed": true,
+      "message": "Spread 3, span 3: expected source offset 274, received 274; gaps, duplicates, and reordering are blocked."
+    },
+    {
+      "code": "span_text",
+      "passed": true,
+      "message": "Spread 3, span 3: allocated text must equal its exact source slice."
+    },
+    {
+      "code": "span_bounds",
+      "passed": true,
+      "message": "Spread 3, span 4: source range [318, 340) must be valid and nonempty."
+    },
+    {
+      "code": "span_coverage",
+      "passed": true,
+      "message": "Spread 3, span 4: expected source offset 318, received 318; gaps, duplicates, and reordering are blocked."
+    },
+    {
+      "code": "span_text",
+      "passed": true,
+      "message": "Spread 3, span 4: allocated text must equal its exact source slice."
+    },
+    {
+      "code": "span_bounds",
+      "passed": true,
+      "message": "Spread 3, span 5: source range [340, 384) must be valid and nonempty."
+    },
+    {
+      "code": "span_coverage",
+      "passed": true,
+      "message": "Spread 3, span 5: expected source offset 340, received 340; gaps, duplicates, and reordering are blocked."
+    },
+    {
+      "code": "span_text",
+      "passed": true,
+      "message": "Spread 3, span 5: allocated text must equal its exact source slice."
+    },
+    {
+      "code": "spread_order",
+      "passed": true,
+      "message": "Spread 4 must occupy its declared position."
+    },
+    {
+      "code": "span_bounds",
+      "passed": true,
+      "message": "Spread 4, span 1: source range [384, 385) must be valid and nonempty."
+    },
+    {
+      "code": "span_coverage",
+      "passed": true,
+      "message": "Spread 4, span 1: expected source offset 384, received 384; gaps, duplicates, and reordering are blocked."
+    },
+    {
+      "code": "span_text",
+      "passed": true,
+      "message": "Spread 4, span 1: allocated text must equal its exact source slice."
+    },
+    {
+      "code": "span_bounds",
+      "passed": true,
+      "message": "Spread 4, span 2: source range [385, 411) must be valid and nonempty."
+    },
+    {
+      "code": "span_coverage",
+      "passed": true,
+      "message": "Spread 4, span 2: expected source offset 385, received 385; gaps, duplicates, and reordering are blocked."
+    },
+    {
+      "code": "span_text",
+      "passed": true,
+      "message": "Spread 4, span 2: allocated text must equal its exact source slice."
+    },
+    {
+      "code": "span_bounds",
+      "passed": true,
+      "message": "Spread 4, span 3: source range [411, 452) must be valid and nonempty."
+    },
+    {
+      "code": "span_coverage",
+      "passed": true,
+      "message": "Spread 4, span 3: expected source offset 411, received 411; gaps, duplicates, and reordering are blocked."
+    },
+    {
+      "code": "span_text",
+      "passed": true,
+      "message": "Spread 4, span 3: allocated text must equal its exact source slice."
+    },
+    {
+      "code": "span_bounds",
+      "passed": true,
+      "message": "Spread 4, span 4: source range [452, 487) must be valid and nonempty."
+    },
+    {
+      "code": "span_coverage",
+      "passed": true,
+      "message": "Spread 4, span 4: expected source offset 452, received 452; gaps, duplicates, and reordering are blocked."
+    },
+    {
+      "code": "span_text",
+      "passed": true,
+      "message": "Spread 4, span 4: allocated text must equal its exact source slice."
+    },
+    {
+      "code": "span_bounds",
+      "passed": true,
+      "message": "Spread 4, span 5: source range [487, 508) must be valid and nonempty."
+    },
+    {
+      "code": "span_coverage",
+      "passed": true,
+      "message": "Spread 4, span 5: expected source offset 487, received 487; gaps, duplicates, and reordering are blocked."
+    },
+    {
+      "code": "span_text",
+      "passed": true,
+      "message": "Spread 4, span 5: allocated text must equal its exact source slice."
+    },
+    {
+      "code": "span_complete",
+      "passed": true,
+      "message": "Ordered spans must end at source offset 508; received 508."
+    },
+    {
+      "code": "reconstructed_exact",
+      "passed": false,
+      "message": "Concatenating actual ordered spread text must reproduce the approved manuscript exactly."
+    },
+    {
+      "code": "production_brief",
+      "passed": true,
+      "message": "A separate production brief is required."
+    },
+    {
+      "code": "issues_schema",
+      "passed": true,
+      "message": "Issues must identify warning or blocking severity and a message."
+    }
+  ],
+  "errors": [
+    {
+      "code": "span_coverage",
+      "message": "Spread 1, span 1: expected source offset 0, received 16; gaps, duplicates, and reordering are blocked.",
+      "expected_start": 0,
+      "actual_start": 16,
+      "spread": 1,
+      "span": 1,
+      "source_offset": 16,
+      "source_line": 2
+    },
+    {
+      "code": "reconstructed_exact",
+      "message": "Concatenating actual ordered spread text must reproduce the approved manuscript exactly.",
+      "source_offset": 0,
+      "source_line": 1,
+      "expected_excerpt": "The Extra Chair\n\nI set a cup beside my own.\nThen I pulled out the little blue ch",
+      "actual_excerpt": "\nI set a cup beside my own.\nThen I pulled out the little blue chair.\n\"Who's comi"
+    }
+  ],
+  "warnings": [
+    {
+      "code": "production_warning",
+      "message": "Spread allocation is a workflow demonstration; professional pagination and design remain outstanding.",
+      "issue_index": 0
+    }
+  ],
+  "candidate_hash": "b916c4bc47173fbe60bbe8a1b1be614e3b428a12efb8d3d7ead8aa648ea59f04"
+}
